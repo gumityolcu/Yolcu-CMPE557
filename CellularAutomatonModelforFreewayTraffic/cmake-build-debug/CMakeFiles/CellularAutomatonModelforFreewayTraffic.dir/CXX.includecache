@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/rehrev/Documents/Okul/CMPE557/CellularAutomatonModelforFreewayTraffic/main.cpp
+iostream
+-
+string
+-
+vector
+-
+random
+-
+math.h
+-
+time.h
+-
+
