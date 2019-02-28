@@ -86,6 +86,10 @@ vector<vector<bool>> RunElementaryCellularAutomaton(int W, vector<bool> c, int N
     {
         W=((W&128)>>7)|((W&64)>>5)|((W&32)>>3)|((W&16)>>1)|((W&8)*2)|((W&4)*8)|((W&2)*32)|((W&1)*128);
         cout<<"Taking 1 as quiescent state (-) or equivalently W="<<W<<endl;
+        for(int l=0;l<c.size();l++)
+        {
+            c[l]=!c[l];
+        }
     }
     else
     {
