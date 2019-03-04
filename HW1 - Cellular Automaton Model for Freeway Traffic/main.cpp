@@ -76,7 +76,6 @@ vector<string> simulate(int L, bool B, double p, int V, double d, int startT, in
 
     //Initialise reh
     int i=0;
-    ri.seed(420);
     while(i<N)
     {
         int rand_i=unifi(ri);
@@ -219,9 +218,15 @@ double probability(double x)
 vector<string> simulate_refined(int L, bool B, int V, double d, int startT, int T)
 {
     vector<string> ret;
+    srand(time(NULL));
+    int seed=rand();
     uniform_real_distribution<double> unifd(0,1);
     default_random_engine rd;
+    rd.seed(seed);
     uniform_int_distribution<int> unifi(0,L);
+    default_random_engine ri;
+    seed=rand();
+    ri.seed(seed);
     default_random_engine ri;
     int N=L*d;
     int reh[L]; // Current road
@@ -238,7 +243,6 @@ vector<string> simulate_refined(int L, bool B, int V, double d, int startT, int 
 
     //Initialise reh
     int i=0;
-    ri.seed(420);
     while(i<N)
     {
         int rand_i=unifi(ri);
