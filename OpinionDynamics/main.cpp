@@ -95,6 +95,7 @@ int main()
     showGrid(grid, "n");
     cout<<count*N*N<<endl;
     waitKey(0);
+
     return 0;
 }
 
@@ -249,9 +250,17 @@ double norm(View v)
 View normalize(View v)
 {
     double len=norm(v);
+    double x=v(0),y=v(1), z=v(2);
     for(int i=0;i<D;i++)
     {
-        v(i)=v(i)/len;
+        if(v(i)>1)
+        {
+            v(i)=1;
+        }
+        else if(v(i)<-1)
+        {
+            v(i)=-1;
+        }
     }
     return v;
 }
@@ -287,7 +296,7 @@ void interact(Grid& grid, int x, int y)
 
     if(y<N-1)
     {
-        p1=1-distance(grid(x,y),grid(x,y+1))/2;
+        p1=1-distance(grid(x,y),grid(x,y+1))/(2*sqrt(D));
     }
     else
     {
@@ -295,7 +304,7 @@ void interact(Grid& grid, int x, int y)
     }
     if(x>0)
     {
-        p2=1-distance(grid(x,y),grid(x-1,y))/2;
+        p2=1-distance(grid(x,y),grid(x-1,y))/(2*sqrt(D));
     }
     else
     {
@@ -303,7 +312,7 @@ void interact(Grid& grid, int x, int y)
     }
     if(y>0)
     {
-        p3=1-distance(grid(x,y),grid(x,y-1))/2;
+        p3=1-distance(grid(x,y),grid(x,y-1))/(2*sqrt(D));
     }
     else
     {
@@ -311,7 +320,7 @@ void interact(Grid& grid, int x, int y)
     }
     if(x<N-1)
     {
-        p4=1-distance(grid(x,y),grid(x+1,y))/2;
+        p4=1-distance(grid(x,y),grid(x+1,y))/(2*sqrt(D));
     }
     else
     {
