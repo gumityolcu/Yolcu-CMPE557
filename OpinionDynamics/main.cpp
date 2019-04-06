@@ -5,8 +5,8 @@
 #include <string>
 #include <time.h>
 
-#define D 2 // dimensions
-#define N 20 // Grid size = N x N
+#define D 3 // dimensions
+#define N 30 // Grid size = N x N
 #define RATE1 0.3
 #define RATE2 0.25
 #define IT 10000 // number of iterations
@@ -39,6 +39,7 @@ int interactions;
 
 int main()
 {
+    char c=32;
     int t=time(NULL);
     srand(time(NULL));
     int seed=rand();
@@ -47,21 +48,45 @@ int main()
     // Uniform random initialisation
     Init_Unif_Rnd(grid);
     int count=0;
-    do
+    int iteration=0;
+    bool in=true;
+    while(in)
     {
-        interactions=0;
-        for(int i=0;i<N*N;i++)
-        {
-            int x=unifi(rnd);
-            int y=unifi(rnd);
-            //cout<<"n = "<<count<<endl;
-            //cout<<"x = "<<x<<"  y = "<<y<<endl;
-            interact(grid,x,y);
-
+        interactions = 0;
+        for (int z = 0; z < iteration; z++) {
+            for (int i = 0; i < N * N; i++) {
+                int x = unifi(rnd);
+                int y = unifi(rnd);
+                //cout<<"n = "<<count<<endl;
+                //cout<<"x = "<<x<<"  y = "<<y<<endl;
+                interact(grid, x, y);
+            }
+            count++;
+            cout << count << endl;
         }
-        count++;
-        cout<<count*N*N<<endl;
-    }while((interactions>0)&&(count*N*N<20000000));
+        showGrid(grid, "n");
+        c = waitKey(0);
+        if (c == 32)
+        {
+            iteration = 1;
+        }
+        else if (c == 113)
+        {
+            in=false;
+        }
+        else if(c==122)
+        {
+            iteration = 300;
+        }
+        else if(c==120)
+        {
+            iteration=5000;
+        }
+        else
+        {
+            Yirmibin=20000;
+        }
+    }
     showGrid(grid, "n");
     cout<<count*N*N<<endl;
     waitKey(0);
@@ -239,7 +264,7 @@ void interact(Grid& grid, int x, int y)
 
     if(y<N-1)
     {
-        p1=1-distance(grid(x,y),grid(x,y+1))/2*sqrt(D);
+        p1=1-distance(grid(x,y),grid(x,y+1))/2;
     }
     else
     {
