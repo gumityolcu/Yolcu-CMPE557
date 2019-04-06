@@ -5,7 +5,7 @@
 #include <string>
 #include <time.h>
 
-#define D 2 // dimensions
+#define D 3 // dimensions
 #define N 20 // Grid size = N x N
 #define RATE1 0.3
 #define RATE2 0.25
@@ -45,23 +45,58 @@ int main()
     rnd.seed(seed);
     Grid grid;
     // Uniform random initialisation
+    bool in=true;
+    char c=32;
     Init_Unif_Rnd(grid);
     int count=0;
-    do
+    int iterations=0;
+    while(in)
     {
-        interactions=0;
-        for(int i=0;i<N*N;i++)
+        interactions = 0;
+        for(int z=0;z<iterations;z++)
         {
-            int x=unifi(rnd);
-            int y=unifi(rnd);
-            //cout<<"n = "<<count<<endl;
-            //cout<<"x = "<<x<<"  y = "<<y<<endl;
-            interact(grid,x,y);
-
+            for (int i = 0; i < N * N; i++)
+            {
+                int x = unifi(rnd);
+                int y = unifi(rnd);
+                //cout<<"n = "<<count<<endl;
+                //cout<<"x = "<<x<<"  y = "<<y<<endl;
+                interact(grid, x, y);
+            }
+            count++;
+            cout<<"T = "<<count<<endl;
         }
-        count++;
-        cout<<count*N*N<<endl;
-    }while((interactions>0)&&(count*N*N<20000000));
+        switch(c)
+        {
+            case 32:
+                showGrid(grid,"n");
+                iterations=0;
+                c=waitKey(0);
+                break;
+
+            case 122:
+                showGrid(grid,"n");
+                c=waitKey(0);
+                iterations=250;
+                break;
+
+            case 120:
+                showGrid(grid,"n");
+                c=waitKey(0);
+                iterations=5000;
+                break;
+
+            case 99:
+                showGrid(grid,"n");
+                c=waitKey(0);
+                iterations=20000;
+                break;
+
+            case 113:
+                in=false;
+                break;
+        }
+    }
     showGrid(grid, "n");
     cout<<count*N*N<<endl;
     waitKey(0);
