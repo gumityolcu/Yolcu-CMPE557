@@ -103,16 +103,23 @@ void show3DGrid(Grid grid, string name)
 {
     Mat M(N*PIXELSPERCELL,N*PIXELSPERCELL,CV_8UC3,Scalar(128,128,128));
     namedWindow(name,WINDOW_AUTOSIZE);
+    bool f=false;
     for(int i=0;i<N;i++)
     {
         for(int j=0;j<N;j++)
         {
+            f=false;
                 for(int k=0;k<PIXELSPERCELL;k++)
                 {
                     for(int l=0;l<PIXELSPERCELL;l++)
                     {
                         for(int dim=0;dim<3;dim++)
                         {
+                            if((!f)&&((grid(i,j)(dim)>1)||(grid(i,j)(dim)<-1)))
+                            {
+                                f=true;
+                                cout<<i<<"  "<<j<<endl;
+                            }
                             M.at<Vec3b>(i*PIXELSPERCELL+k,j*PIXELSPERCELL+l)[dim]=(grid(i,j)(dim)+1)*128;
                         }
                     }
