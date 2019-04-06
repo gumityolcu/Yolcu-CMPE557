@@ -35,6 +35,9 @@ void show3DGrid(Grid grid, string name);
 void show2DGrid(Grid grid, string name);
 void show1DGrid(Grid grid, string name);
 void showGrid(Grid grid, string name);
+double norm(View v);
+View normalize(View v);
+
 int interactions;
 
 int main()
@@ -53,8 +56,10 @@ int main()
     while(in)
     {
         interactions = 0;
-        for (int z = 0; z < iteration; z++) {
-            for (int i = 0; i < N * N; i++) {
+        for (int z = 0; z < iteration; z++)
+        {
+            for (int i = 0; i < N * N; i++)
+            {
                 int x = unifi(rnd);
                 int y = unifi(rnd);
                 //cout<<"n = "<<count<<endl;
@@ -66,11 +71,11 @@ int main()
         }
         showGrid(grid, "n");
         c = waitKey(0);
-        if (c == 32)
+        if(c == 32)
         {
             iteration = 1;
         }
-        else if (c == 113)
+        else if(c == 113)
         {
             in=false;
         }
@@ -84,7 +89,7 @@ int main()
         }
         else
         {
-            Yirmibin=20000;
+            iteration=20000;
         }
     }
     showGrid(grid, "n");
@@ -227,14 +232,28 @@ void showGrid(Grid grid, string name)
 
 double distance(View v1, View v2)
 {
-    View diff=v1-v2;
+    return norm(v1-v2);
+}
+
+double norm(View v)
+{
     double n=0;
     for(int i=0;i<D;i++)
     {
-        n=n+diff(i)*diff(i);
+        n=n+v(i)*v(i);
     }
     n=sqrt(n);
     return n;
+}
+
+View normalize(View v)
+{
+    double len=norm(v);
+    for(int i=0;i<D;i++)
+    {
+        v(i)=v(i)/len;
+    }
+    return v;
 }
 
 void converse(Grid& grid, int x1, int y1, int x2, int y2)
@@ -249,10 +268,14 @@ void converse(Grid& grid, int x1, int y1, int x2, int y2)
     grid(x1,y1)=grid(x1,y1)+RATE1*(grid(x2,y2)-grid(x1,y1));
     grid(x2,y2)=grid(x2,y2)-RATE2*(grid(x1,y1)-grid(x2,y2));
     interactions++;
-    for(int a=0;a<grid(x1,y1).size();a++)
+    //Normalize
+    if(norm(grid(x1,y1))>1)
     {
-        //cout<<grid(x1,y1)(a)<<'\t'<<grid(x2,y2)(a)<<endl;
-        //cout<<(grid(x1,y1)(a)+1)*128<<'\t'<<(grid(x2,y2)(a)+1)*128<<endl;
+        grid(x1,y1)=normalize(grid(x1,y1));
+    }
+    if(norm(grid(x2,y2))>1)
+    {
+        grid(x2,y2)=normalize(grid(x2,y2));
     }
     return;
 }
