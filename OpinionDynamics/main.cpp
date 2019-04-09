@@ -7,8 +7,8 @@
 
 #define D 3 // dimensions
 #define N 30 // Grid size = N x N
-#define RATE1 0.15
-#define RATE2 0.3
+#define RATE1 0.35
+#define RATE2 0.5
 #define IT 10000 // number of iterations
 #define PIXELSPERCELL 25
 #define THETA1 0.2
@@ -36,6 +36,8 @@ void show2DGrid(Grid grid, string name);
 void show1DGrid(Grid grid, string name);
 void showGrid(Grid grid, string name);
 double norm(View v);
+void writeFile(string fname, Grid& grid);
+//string to_string(int i);
 View normalize(View v);
 
 int interactions;
@@ -43,7 +45,10 @@ int interactions;
 int main()
 {
     char c=32;
+    string g=to_string(42);
+    int z=0;
     int t=time(NULL);
+    string filename;
     srand(time(NULL));
     int seed=rand();
     rnd.seed(seed);
@@ -51,28 +56,41 @@ int main()
     // Uniform random initialisation
     Init_Unif_Rnd(grid);
     int count=0;
-    int iteration=0;
+    int iterations[]={0,10,30,50,150,500,800,1500,7500,15000,20000,40000};
     bool in=true;
     while(in)
     {
         interactions = 0;
-        for (int z = 0; z < iteration; z++)
+        for (int i = 0; i < N * N; i++)
         {
-            for (int i = 0; i < N * N; i++)
-            {
-                int x = unifi(rnd);
-                int y = unifi(rnd);
-                //cout<<"n = "<<count<<endl;
-                //cout<<"x = "<<x<<"  y = "<<y<<endl;
-                interact(grid, x, y);
-            }
-            count++;
-            cout << count << endl;
+            int x = unifi(rnd);
+            int y = unifi(rnd);
+            //cout<<"n = "<<count<<endl;
+            //cout<<"x = "<<x<<"  y = "<<y<<endl;
+            interact(grid, x, y);
         }
-        showGrid(grid, "n");
-        c = waitKey(0);
-        if(c == 32)
+        if(z<12)
         {
+            if(count==iterations[z])
+            {
+                filename="./"+to_string(count)+".jpg";
+                writeFile(filename, grid);
+                z++;
+            }
+        }
+        count++;
+        cout << count << endl;
+        if(count==40001)
+        {
+            in=false;
+        }
+        //writeFile("./a.jpg",grid);
+        //in=false;
+    }
+    showGrid(grid, "n");
+    c = waitKey(0);
+    /*if(c == 32)
+    {
             iteration = 1;
         }
         else if(c == 113)
@@ -91,12 +109,33 @@ int main()
         {
             iteration=20000;
         }
-    }
-    showGrid(grid, "n");
+    }*/
     cout<<count*N*N<<endl;
-    waitKey(0);
 
     return 0;
+}
+
+void writeFile(string fname, Grid& grid)
+{
+    Mat M(N*PIXELSPERCELL,N*PIXELSPERCELL,CV_8UC3,Scalar(128,128,128));
+    for(int i=0;i<N;i++)
+    {
+        for(int j=0;j<N;j++)
+        {
+            for(int k=0;k<PIXELSPERCELL;k++)
+            {
+                for(int l=0;l<PIXELSPERCELL;l++)
+                {
+                    for(int dim=0;dim<3;dim++)
+                    {
+                        M.at<Vec3b>(i*PIXELSPERCELL+k,j*PIXELSPERCELL+l)[dim]=(grid(i,j)(dim)+1.0)*127;
+                    }
+                }
+            }
+        }
+    }
+    imwrite(fname,M);
+    return;
 }
 
 void show3DGrid(Grid grid, string name)
@@ -381,3 +420,15 @@ void interact(Grid& grid, int x, int y)
     //cout<<"*****"<<endl<<endl;
     return;
 }
+/*
+string to_string(int i)
+{
+    string s;
+    while(i>0)
+    {
+        char c='0'+(i%10);
+        s=s+c;
+        i=i%10;
+    }
+    return s;
+}*/
