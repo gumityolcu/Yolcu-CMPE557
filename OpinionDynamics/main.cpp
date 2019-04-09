@@ -7,11 +7,11 @@
 
 #define D 3 // dimensions
 #define N 30 // Grid size = N x N
-#define RATE1 0.3
-#define RATE2 0.25
+#define RATE1 0.15
+#define RATE2 0.3
 #define IT 10000 // number of iterations
 #define PIXELSPERCELL 25
-#define THETA1 0.1
+#define THETA1 0.2
 #define THETA2 0.0001
 
 using namespace Eigen;
@@ -109,21 +109,24 @@ void show3DGrid(Grid grid, string name)
         for(int j=0;j<N;j++)
         {
             f=false;
-                for(int k=0;k<PIXELSPERCELL;k++)
+            for(int d=0;d<D;d++)
+            {
+                if ((!f) && ((grid(i, j)(d) > 1) || (grid(i, j)(d) < -1)))
                 {
-                    for(int l=0;l<PIXELSPERCELL;l++)
+                    f = true;
+                    cout << i << "  " << j << endl;
+                }
+            }
+            for(int k=0;k<PIXELSPERCELL;k++)
+            {
+                for(int l=0;l<PIXELSPERCELL;l++)
+                {
+                    for(int dim=0;dim<3;dim++)
                     {
-                        for(int dim=0;dim<3;dim++)
-                        {
-                            if((!f)&&((grid(i,j)(dim)>1)||(grid(i,j)(dim)<-1)))
-                            {
-                                f=true;
-                                cout<<i<<"  "<<j<<endl;
-                            }
-                            M.at<Vec3b>(i*PIXELSPERCELL+k,j*PIXELSPERCELL+l)[dim]=(grid(i,j)(dim)+1)*128;
-                        }
+                        M.at<Vec3b>(i*PIXELSPERCELL+k,j*PIXELSPERCELL+l)[dim]=(grid(i,j)(dim)+1.0)*127;
                     }
                 }
+            }
         }
     }
     imshow(name, M);
@@ -274,17 +277,25 @@ View normalize(View v)
 
 void converse(Grid& grid, int x1, int y1, int x2, int y2)
 {
-    for(int a=0;a<grid(x1,y1).size();a++)
-    {
-        //cout<<grid(x1,y1)(a)<<'\t'<<grid(x2,y2)(a)<<endl;
-        //cout<<(grid(x1,y1)(a)+1)*128<<'\t'<<(grid(x2,y2)(a)+1)*128<<endl;
-    }
-    //cout<<endl<<"======="<<endl<<endl;
-
-    grid(x1,y1)=grid(x1,y1)+RATE1*(grid(x2,y2)-grid(x1,y1));
-    grid(x2,y2)=grid(x2,y2)-RATE2*(grid(x1,y1)-grid(x2,y2));
+    //grid(x1,y1)=grid(x1,y1)+RATE1*(grid(x2,y2)-grid(x1,y1));
+    grid(x2,y2)=grid(x2,y2)+RATE2*(grid(x1,y1)-grid(x2,y2));
     interactions++;
-    //Normalize
+    grid(x1,y1)=(1.0+RATE1)*grid(x1,y1);
+    for(int i=0;i<D;i++)
+    {
+        if(grid(x1,y1)(i)>1)
+        {
+            grid(x1,y1)(i)=1;
+        }
+        else
+        {
+            if(grid(x1,y1)(i)<-1)
+            {
+                grid(x1,y1)(i)=-1;
+            }
+        }
+    }
+   /* //Normalize
     if(norm(grid(x1,y1))>1)
     {
         grid(x1,y1)=normalize(grid(x1,y1));
@@ -292,7 +303,7 @@ void converse(Grid& grid, int x1, int y1, int x2, int y2)
     if(norm(grid(x2,y2))>1)
     {
         grid(x2,y2)=normalize(grid(x2,y2));
-    }
+    }*/
     return;
 }
 
