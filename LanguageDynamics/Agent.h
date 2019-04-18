@@ -10,10 +10,10 @@
 #include <random>
 #include <time.h>
 
-#define m 3 // Memory size
-#define l 10 // Word length
-#define M 15// Number of meanings
-#define N 30 // Number of agents
+#define m 20 // Memory size
+#define l 2 // Word length
+#define M 40// Number of meanings
+#define N 20 // Number of agents
 
 typedef struct _Word
 {
@@ -24,6 +24,7 @@ typedef struct _Word
 class Agent {
 public:
     Eigen::MatrixXi A;
+    bool matrixReady=false;
     int memoryCount[M];
     char memory[M][m][l+1];
     int memoryIndex[M];

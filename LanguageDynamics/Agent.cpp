@@ -174,4 +174,6 @@ void Agent::generateMatrix()
             A(r,c)=cnt;
         }
     }
+    this->matrixReady=true;
+    return;
 }
