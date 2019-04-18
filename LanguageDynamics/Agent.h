@@ -7,23 +7,76 @@
 
 #include <Eigen/Dense>
 #include <vector>
+#include <random>
+#include <time.h>
 
 #define m 20 // Memory size
-#define l 5 // Word length
-#define M 5 // Number of meanings
-#define N 10 // Number of agents
+#define l 3 // Word length
+#define M 10// Number of meanings
+#define N 80 // Number of agents
 
+typedef struct _Word
+{
+    std::string word;
+    int freq;
+}Word;
 class Agent {
-    //Eigen::MatrixXi A;
+public:
+    Eigen::MatrixXi A;
+    int memoryCount[M];
     char memory[M][m][l+1];
     int memoryIndex[M];
-    static std::vector<char[l+1]> words;
+    static std::vector<Word> dictionary;
+    static int unders;
 
     Agent();
     ~Agent();
-    void incrementMemoryIndex(int i);
-    bool speak(int meaning, Agent& a);
-    bool listen(char* s, int meaning);
+    bool speak(Agent& a, std::default_random_engine rnd);
+    bool listen(int meaning, char* s, std::default_random_engine rnd);
+    void updateMemory(int meaning, char* word);
+    void makeUpWord(char * word, std::default_random_engine rnd);
+    static void addToDictionary(std::string word)
+    {
+        bool f=false;
+        for(int i=0;((i<dictionary.size())&&(!f));i++)
+        {
+            if(dictionary[i].word==word)
+            {
+                f=true;
+                dictionary[i].freq++;
+            }
+        }
+        if(!f)
+        {
+            Word w;
+            w.word=word;
+            w.freq=1;
+            dictionary.push_back(w);
+        }
+        return;
+    }
+
+    static void removeFromDictionary(std::string word)
+    {
+        if(word=="")
+        {
+            return;
+        }
+        bool f=false;
+        for(int i=0;((!f)&&(i<dictionary.size()));i++)
+        {
+            if(dictionary[i].word==word)
+            {
+                f=true;
+                dictionary[i].freq--;
+                if(dictionary[i].freq==0)
+                {
+                    dictionary.erase(dictionary.begin()+i);
+                }
+            }
+        }
+        return;
+    }
 };
 
 
