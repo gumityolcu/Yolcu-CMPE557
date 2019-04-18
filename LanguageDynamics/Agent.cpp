@@ -3,6 +3,7 @@
 //
 
 #include "Agent.h"
+#include<iostream>
 
 bool isvowel(char c)
 {
@@ -24,11 +25,6 @@ std::string to_string(char* c)
     for(int i=0;i<l;i++)
     {
         s=s+c[i];
-    }
-    if(!isvowel(s[0]))
-    {
-        int a;
-        a=5;
     }
     return s;
 }
@@ -78,19 +74,8 @@ void Agent::makeUpWord(char* word, std::default_random_engine rnd)
 }
 void Agent::updateMemory(int meaning, char* word)
 {
-    if(!isvowel(this->memory[meaning][this->memoryIndex[meaning]][0]))
-    {
-        int x;
-        x=5;
-        x++;
-    }
     removeFromDictionary(to_string(this->memory[meaning][this->memoryIndex[meaning]]));
     strncpy(this->memory[meaning][this->memoryIndex[meaning]],word, l);
-    if(!isvowel(word[0]))
-    {
-        int x=5;
-        x++;
-    }
     addToDictionary(to_string(word));
     this->memoryIndex[meaning]=(this->memoryIndex[meaning]+1)%m;
     if(this->memoryCount[meaning]<m-1)
@@ -105,15 +90,11 @@ bool Agent::speak(Agent& a, std::default_random_engine rnd)
     std::uniform_int_distribution<int> unifM(0,M-1);
     int meaning=unifM(rnd);
     //meaning = 3;
+    std::cout<<" meaning: "<<meaning;
     char s[l+1];
     if(this->memoryCount[meaning]==0)
     {
         makeUpWord(s,rnd);
-        if(!isvowel(s[0]))
-        {
-            int a=4;
-            a++;
-        }
         updateMemory(meaning, s);
     }
     else
@@ -121,29 +102,24 @@ bool Agent::speak(Agent& a, std::default_random_engine rnd)
         std::uniform_int_distribution<int> unif(0,this->memoryCount[meaning]-1);
         int r=unif(rnd);
         strncpy(s,this->memory[meaning][r],l);
-        if(!isvowel(s[0]))
-        {
-            int it=0;
-            it++;
-        }
     }
-    if(!isvowel(s[0]))
-    {
-        int it=0;
-        it++;
-    }
+    std::cout<<" \""<<s<<"\" ";
     bool ret=a.listen(meaning,s, rnd);
     if(ret)
     {
+        std::cout<<"understood"<<std::endl;
         this->updateMemory(meaning,s);
+    }
+    else
+    {
+        std::cout<<"understoodn't"<<std::endl;
     }
 
     for(int a=0;a<dictionary.size();a++)
     {
         if(!isvowel(dictionary[a].word[0]))
         {
-            int sss=0;
-            sss++;
+            std::cout<<"rezalet"<<std::endl;
         }
     }
     return ret;
@@ -174,11 +150,28 @@ bool Agent::listen(int meaning, char* s, std::default_random_engine rnd)
             unders++;
         }
     }
-    if(!isvowel(s[0]))
-    {
-        int sasd=0;
-        sasd++;
-    }
     this->updateMemory(meaning,s);
     return understood;
+}
+
+void Agent::generateMatrix()
+{
+    this->A.resize(M,dictionary.size());
+    for(int r=0;r<M;r++)
+    {
+        for(int c=0;c<dictionary.size();c++)
+        {
+            int cnt=0;
+            for(int i=0;i<m;i++)
+            {
+                char kelime[l+1];
+                strncpy(kelime,dictionary[c].word.c_str(),l);
+                if(streq(this->memory[r][i],kelime))
+                {
+                    cnt++;
+                }
+            }
+            A(r,c)=cnt;
+        }
+    }
 }
