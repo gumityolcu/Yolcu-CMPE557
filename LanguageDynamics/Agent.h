@@ -10,9 +10,9 @@
 #include <random>
 #include <time.h>
 
-#define m 20 // Memory size
+#define m 15 // Memory size
 #define l 2 // Word length
-#define M 40// Number of meanings
+#define M 20// Number of meanings
 #define N 20 // Number of agents
 
 typedef struct _Word
