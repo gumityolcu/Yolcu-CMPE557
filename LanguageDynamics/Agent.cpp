@@ -90,7 +90,7 @@ bool Agent::speak(Agent& a, std::default_random_engine rnd)
     std::uniform_int_distribution<int> unifM(0,M-1);
     int meaning=unifM(rnd);
     //meaning = 3;
-    std::cout<<" meaning: "<<meaning;
+    //std::cout<<" meaning: "<<meaning;
     char s[l+1];
     if(this->memoryCount[meaning]==0)
     {
@@ -103,16 +103,16 @@ bool Agent::speak(Agent& a, std::default_random_engine rnd)
         int r=unif(rnd);
         strncpy(s,this->memory[meaning][r],l);
     }
-    std::cout<<" \""<<s<<"\" ";
+    //std::cout<<" \""<<s<<"\" ";
     bool ret=a.listen(meaning,s, rnd);
     if(ret)
     {
-        std::cout<<"understood"<<std::endl;
+        //std::cout<<"understood"<<std::endl;
         this->updateMemory(meaning,s);
     }
     else
     {
-        std::cout<<"understoodn't"<<std::endl;
+        //std::cout<<"understoodn't"<<std::endl;
     }
 
     for(int a=0;a<dictionary.size();a++)

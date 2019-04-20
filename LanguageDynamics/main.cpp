@@ -27,7 +27,7 @@ int main()
                 k=unif(rnd);
             }
             //i=0;k=1;
-            cout<<i<<" speaking to "<<k;
+            //cout<<i<<" speaking to "<<k;
             agents[i].speak(agents[k],rnd);
         }
     }
@@ -50,14 +50,14 @@ int main()
         }
         avgFreq+=freq;
     }
-    avgFreq/=Agent::dictionary.size();
+    //avgFreq/=Agent::dictionary.size();
     cout<<"Dict size: "<<Agent::dictionary.size()<<endl;
-    cout<<"Average freq: "<<avgFreq<<endl;
+    /*cout<<"Average freq: "<<avgFreq<<endl;
     cout<<"Average utilisation: "<<(double)avgFreq/(double)(N*m*M)<<endl;
     cout<<"Max freq: "<<maxFreq<<"  "<<Agent::dictionary[maxind].word<<endl;
     cout<<"Max Utilisation: "<<(double)maxFreq/(double)(N*m*M)<<endl;
     cout<<"Min freq: "<<minFreq<<"  "<<Agent::dictionary[minind].word<<endl;
-    cout<<"Min Util: "<<(double)minFreq/(double)(N*m*M)<<endl<<endl<<endl<<endl<<endl;
+    cout<<"Min Util: "<<(double)minFreq/(double)(N*m*M)<<endl<<endl<<endl<<endl<<endl;*/
 
     for(int ag=0;ag<agents.size();ag++)
     {
