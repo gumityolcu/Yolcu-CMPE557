@@ -11,9 +11,9 @@
 #include <time.h>
 
 
-#define m 1// Memory size
-#define l 2 // Word length
-#define M 50// Number of meanings
+//#define m 1// Memory size
+//#define l 2 // Word length
+//#define M 50// Number of meanings
 
 
 typedef struct _Word
@@ -31,9 +31,9 @@ public:
     int* memoryIndex;
     static std::vector<Word> dictionary;
     static int unders;
-    //static int M;
-    //static int m;
-    //static int l;
+    static int M;
+    static int m;
+    static int l;
     void generateMatrix();
 
     Agent();

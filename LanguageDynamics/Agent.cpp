@@ -22,7 +22,7 @@ bool streq(char* s1, char* s2)
 std::string to_string(char* c)
 {
     std::string s="";
-    for(int i=0;i</*Agent::*/l;i++)
+    for(int i=0;i<Agent::l;i++)
     {
         s=s+c[i];
     }
@@ -31,9 +31,9 @@ std::string to_string(char* c)
 
 
 std::vector<Word> Agent::dictionary;
-//int Agent::M=50;
-//int Agent::m=1;
-//int Agent::l=2;
+int Agent::M=50;
+int Agent::m=60;
+int Agent::l=2;
 int Agent::unders=0;
 
 Agent::Agent()

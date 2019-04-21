@@ -91,7 +91,7 @@ double calculateFitnessBetweenAgents(Agent& a1, Agent& a2)
         }
         sum=sum+meanfit;
     }
-    fitness=sum/(double)/*Agent::*/M;
+    fitness=sum/(double)Agent::M;
     return fitness;
 }
 
