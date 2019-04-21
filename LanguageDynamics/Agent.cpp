@@ -22,7 +22,7 @@ bool streq(char* s1, char* s2)
 std::string to_string(char* c)
 {
     std::string s="";
-    for(int i=0;i<l;i++)
+    for(int i=0;i<Agent::l;i++)
     {
         s=s+c[i];
     }
@@ -31,14 +31,22 @@ std::string to_string(char* c)
 
 
 std::vector<Word> Agent::dictionary;
+int Agent::M=50;
+int Agent::m=1;
+int Agent::l=2;
 int Agent::unders=0;
 
 Agent::Agent()
 {
+    this->memoryCount=new int[M];
+    this->memoryIndex=new int[M];
+    this->memory=new char**[M];
     for(int i=0;i<M;i++)
     {
+        this->memory[i]=new char*[m];
         for(int j=0;j<m;j++)
         {
+            this->memory[i][j]=new char[l+1];
             strncpy(this->memory[i][j],"",l);
         }
         this->memoryIndex[i]=0;
@@ -49,7 +57,17 @@ Agent::Agent()
 
 Agent::~Agent()
 {
-
+    delete this->memoryCount;
+    delete this->memoryIndex;
+    for(int i=0;i<M;i++)
+    {
+        for(int j=0;j<m;j++)
+        {
+            delete this->memory[i][j];
+        }
+        delete this->memory[i];
+    }
+    delete this->memory;
 }
 
 void Agent::makeUpWord(char* word, std::default_random_engine rnd)
@@ -78,7 +96,7 @@ void Agent::updateMemory(int meaning, char* word)
     strncpy(this->memory[meaning][this->memoryIndex[meaning]],word, l);
     addToDictionary(to_string(word));
     this->memoryIndex[meaning]=(this->memoryIndex[meaning]+1)%m;
-    if(this->memoryCount[meaning]<m-1)
+    if(this->memoryCount[meaning]<m)
     {
         this->memoryCount[meaning]++;
     }
@@ -101,7 +119,7 @@ bool Agent::speak(Agent& a, std::default_random_engine rnd)
     {
         std::uniform_int_distribution<int> unif(0,this->memoryCount[meaning]-1);
         int r=unif(rnd);
-        strncpy(s,this->memory[meaning][r],l);
+        strncpy(s,this->memory[meaning][r],l+1);
     }
     //std::cout<<" \""<<s<<"\" ";
     bool ret=a.listen(meaning,s, rnd);
@@ -165,7 +183,7 @@ void Agent::generateMatrix()
             for(int i=0;i<m;i++)
             {
                 char kelime[l+1];
-                strncpy(kelime,dictionary[c].word.c_str(),l);
+                strncpy(kelime,dictionary[c].word.c_str(),l+1);
                 if(streq(this->memory[r][i],kelime))
                 {
                     cnt++;

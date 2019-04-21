@@ -10,10 +10,11 @@
 #include <random>
 #include <time.h>
 
-#define m 2// Memory size
-#define l 3 // Word length
-#define M 50// Number of meanings
-#define N 20 // Number of agents
+
+//#define m 10// Memory size
+//#define l 2 // Word length
+//#define M 50// Number of meanings
+
 
 typedef struct _Word
 {
@@ -25,11 +26,14 @@ class Agent {
 public:
     Eigen::MatrixXi A;
     bool matrixReady=false;
-    int memoryCount[M];
-    char memory[M][m][l+1];
-    int memoryIndex[M];
+    int* memoryCount;
+    char*** memory;
+    int* memoryIndex;
     static std::vector<Word> dictionary;
     static int unders;
+    static int M;
+    static int m;
+    static int l;
     void generateMatrix();
 
     Agent();

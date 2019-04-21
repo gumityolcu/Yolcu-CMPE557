@@ -1,6 +1,8 @@
 #include <iostream>
 #include "Agent.h"
 
+#define N 20 // Number of agents
+
 using namespace std;
 using namespace Eigen;
 
@@ -31,7 +33,14 @@ int main()
             agents[i].speak(agents[k],rnd);
         }
     }
-    int avgFreq=0;
+
+    for(int ag=0;ag<agents.size();ag++)
+    {
+        agents[ag].generateMatrix();
+        //cout<<endl<<agents[ag].A<<endl<<endl;
+    }
+    cout<<calculatePopulationFitness(agents);
+    /*int avgFreq=0;
     int maxFreq=Agent::dictionary[0].freq;
     int maxind=0, minind=0;
     int minFreq=Agent::dictionary[0].freq;
@@ -50,21 +59,14 @@ int main()
         }
         avgFreq+=freq;
     }
-    //avgFreq/=Agent::dictionary.size();
+    avgFreq/=Agent::dictionary.size();
     cout<<"Dict size: "<<Agent::dictionary.size()<<endl;
-    /*cout<<"Average freq: "<<avgFreq<<endl;
+    cout<<"Average freq: "<<avgFreq<<endl;
     cout<<"Average utilisation: "<<(double)avgFreq/(double)(N*m*M)<<endl;
     cout<<"Max freq: "<<maxFreq<<"  "<<Agent::dictionary[maxind].word<<endl;
     cout<<"Max Utilisation: "<<(double)maxFreq/(double)(N*m*M)<<endl;
     cout<<"Min freq: "<<minFreq<<"  "<<Agent::dictionary[minind].word<<endl;
     cout<<"Min Util: "<<(double)minFreq/(double)(N*m*M)<<endl<<endl<<endl<<endl<<endl;*/
-
-    for(int ag=0;ag<agents.size();ag++)
-    {
-        agents[ag].generateMatrix();
-        //cout<<endl<<agents[ag].A<<endl<<endl;
-    }
-    cout<<calculatePopulationFitness(agents);
     return 0;
 }
 
@@ -77,6 +79,7 @@ double calculateFitnessBetweenAgents(Agent& a1, Agent& a2)
     }
     MatrixXd a1E,a2C;
     a1E=normaliseByRow(a1.A);
+    //cout<<a1.A<<endl<<endl<<endl<<a2.A<<endl<<endl;
     a2C=normaliseByRow(a2.A.transpose());
     double sum=0;
     for(int r=0;r<a1.A.rows();r++)
@@ -88,7 +91,7 @@ double calculateFitnessBetweenAgents(Agent& a1, Agent& a2)
         }
         sum=sum+meanfit;
     }
-    fitness=sum/(double)M;
+    fitness=sum/(double)Agent::M;
     return fitness;
 }
 
