@@ -9,8 +9,6 @@
 #include <vector>
 #include <random>
 #include <time.h>
-
-
 //#define m 1// Memory size
 //#define l 2 // Word length
 //#define M 50// Number of meanings
