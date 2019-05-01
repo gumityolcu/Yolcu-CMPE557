@@ -5,49 +5,23 @@
 #include "Agent.h"
 #include<iostream>
 
-bool isvowel(char c)
-{
-    if((c!='a')&&(c!='e')&&(c!='i')&&(c!='o')&&(c!='u')&&(c!='\0'))
-    {
-        return false;
-    }
-    return true;
-}
-
-bool streq(char* s1, char* s2)
-{
-    return (strcmp(s1,s2)==0);
-}
-
-std::string to_string(char* c)
-{
-    std::string s="";
-    for(int i=0;i<Agent::l;i++)
-    {
-        s=s+c[i];
-    }
-    return s;
-}
-
-
 std::vector<Word> Agent::dictionary;
 int Agent::M;
 int Agent::m;
-int Agent::l;
+unsigned int Agent::W;
 int Agent::unders=0;
 
 Agent::Agent()
 {
     this->memoryCount=new int[M];
     this->memoryIndex=new int[M];
-    this->memory=new char**[M];
+    this->memory=new unsigned int*[M];
     for(int i=0;i<M;i++)
     {
-        this->memory[i]=new char*[m];
+        this->memory[i]=new unsigned int[m];
         for(int j=0;j<m;j++)
         {
-            this->memory[i][j]=new char[l+1];
-            strncpy(this->memory[i][j],"",l);
+            this->memory[i][j]=0;
         }
         this->memoryIndex[i]=0;
         this->memoryCount[i]=0;
@@ -61,40 +35,22 @@ Agent::~Agent()
     delete this->memoryIndex;
     for(int i=0;i<M;i++)
     {
-        for(int j=0;j<m;j++)
-        {
-            delete this->memory[i][j];
-        }
         delete this->memory[i];
     }
     delete this->memory;
 }
 
-void Agent::makeUpWord(char* word, std::default_random_engine rnd)
+void Agent::makeUpWord(unsigned int* word, std::default_random_engine rnd)
 {
-    char vowel[]={'a','e','i','o','u'};
-    char ot[]={'b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','y','z'};
-    std::uniform_int_distribution<int> unifV(0,sizeof(vowel)-1);
-    std::uniform_int_distribution<int> unifO(0,sizeof(ot)-1);
-    for(int i=0;i<l;i++)
-    {
-        if(i%2==0)
-        {
-            word[i]=vowel[unifV(rnd)];
-        }
-        else
-        {
-            word[i]=ot[unifO(rnd)];
-        }
-    }
-    word[l]='\0';
+    std::uniform_int_distribution<int> unif(1,Agent::W);
+    *(word)=unif(rnd);
     return;
 }
-void Agent::updateMemory(int meaning, char* word)
+void Agent::updateMemory(int meaning, unsigned int word)
 {
-    removeFromDictionary(to_string(this->memory[meaning][this->memoryIndex[meaning]]));
-    strncpy(this->memory[meaning][this->memoryIndex[meaning]],word, l+1);
-    addToDictionary(to_string(word));
+    removeFromDictionary(this->memory[meaning][this->memoryIndex[meaning]]);
+    this->memory[meaning][this->memoryIndex[meaning]]=word;
+    addToDictionary(word);
     this->memoryIndex[meaning]=(this->memoryIndex[meaning]+1)%m;
     if(this->memoryCount[meaning]<m)
     {
@@ -109,17 +65,17 @@ bool Agent::speak(Agent& a, std::default_random_engine rnd)
     int meaning=unifM(rnd);
     //meaning = 3;
     //std::cout<<" meaning: "<<meaning;
-    char s[l+1];
+    unsigned int s;
     if(this->memoryCount[meaning]==0)
     {
-        makeUpWord(s,rnd);
+        makeUpWord(&s,rnd);
         updateMemory(meaning, s);
     }
     else
     {
         std::uniform_int_distribution<int> unif(0,this->memoryCount[meaning]-1);
         int r=unif(rnd);
-        strncpy(s,this->memory[meaning][r],l+1);
+        s=this->memory[meaning][r];
     }
     //std::cout<<" \""<<s<<"\" ";
     bool ret=a.listen(meaning,s, rnd);
@@ -133,17 +89,10 @@ bool Agent::speak(Agent& a, std::default_random_engine rnd)
         //std::cout<<"understoodn't"<<std::endl;
     }
 
-    for(int a=0;a<dictionary.size();a++)
-    {
-        if(!isvowel(dictionary[a].word[0]))
-        {
-            std::cout<<"rezalet"<<std::endl;
-        }
-    }
     return ret;
 }
 
-bool Agent::listen(int meaning, char* s, std::default_random_engine rnd)
+bool Agent::listen(int meaning, unsigned int s, std::default_random_engine rnd)
 {
     bool understood=false;
     std::vector<int> prob;
@@ -152,7 +101,7 @@ bool Agent::listen(int meaning, char* s, std::default_random_engine rnd)
     {
         for(int j=0;j<this->memoryCount[i];j++)
         {
-            if(streq(this->memory[i][j],s))
+            if(this->memory[i][j]==s)
             {
                 prob.push_back(i);
             }
@@ -182,9 +131,9 @@ void Agent::generateMatrix()
             int cnt=0;
             for(int i=0;i<m;i++)
             {
-                char kelime[l+1];
-                strncpy(kelime,dictionary[c].word.c_str(),l+1);
-                if(streq(this->memory[r][i],kelime))
+                unsigned int kelime;
+                kelime=dictionary[c].word;
+                if(this->memory[r][i]==kelime)
                 {
                     cnt++;
                 }

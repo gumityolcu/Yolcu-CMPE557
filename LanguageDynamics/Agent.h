@@ -16,7 +16,7 @@
 
 typedef struct _Word
 {
-    std::string word;
+    unsigned int word;
     int freq;
 }Word;
 
@@ -25,22 +25,22 @@ public:
     Eigen::MatrixXi A;
     bool matrixReady=false;
     int* memoryCount;
-    char*** memory;
+    unsigned int** memory;
     int* memoryIndex;
     static std::vector<Word> dictionary;
     static int unders;
     static int M;
     static int m;
-    static int l;
+    static unsigned int W;
     void generateMatrix();
     Agent();
 
     ~Agent();
     bool speak(Agent& a, std::default_random_engine rnd);
-    bool listen(int meaning, char* s, std::default_random_engine rnd);
-    void updateMemory(int meaning, char* word);
-    void makeUpWord(char * word, std::default_random_engine rnd);
-    static void addToDictionary(std::string word)
+    bool listen(int meaning, unsigned int s, std::default_random_engine rnd);
+    void updateMemory(int meaning, unsigned int word);
+    void makeUpWord(unsigned int* word, std::default_random_engine rnd);
+    static void addToDictionary(unsigned int word)
     {
         bool f=false;
         for(int i=0;((i<dictionary.size())&&(!f));i++)
@@ -60,9 +60,9 @@ public:
         }
         return;
     }
-    static void removeFromDictionary(std::string word)
+    static void removeFromDictionary(unsigned int word)
     {
-        if(word=="")
+        if(word==0)
         {
             return;
         }
@@ -82,9 +82,9 @@ public:
         return;
     }
 
-    static void setParameters(int MM,int mm, int ll)
+    static void setParameters(int MM,int mm, int WW)
     {
-        M=MM;m=mm;l=ll;
+        M=MM;m=mm;W=WW;
         dictionary.resize(0);
         return;
     }

@@ -7,14 +7,14 @@ using namespace Eigen;
 double calculateFitnessBetweenAgents(Agent& a1, Agent& a2);
 double calculatePopulationFitness(vector<Agent>& population, int N);
 MatrixXd normaliseByRow(MatrixXi mat);
-double runSimulation(int NN, int MM, int mm, int ll, int IT);
+double runSimulation(int NN, int MM, int mm, int WW, int IT);
 
 int main()
 {
     string matlab="M=[1:100];F=[";
     for(int i=1;i<101;i++)
     {
-        double r=runSimulation(20,50,i,2,4000);
+        double r=runSimulation(20,50,i,105,4000);
         cout<<"i: "<<i<<"  "<<r<<endl;
         matlab+=to_string(r);
         if(i<100)
@@ -95,14 +95,14 @@ MatrixXd normaliseByRow(MatrixXi mat)
     return ret;
 }
 
-double runSimulation(int N, int MM, int mm, int ll, int IT)
+double runSimulation(int N, int MM, int mm, int WW, int IT)
 {
     uniform_int_distribution<int> unif(0,N-1);
     default_random_engine rnd;
     srand(time(NULL));
     int seed=rand();
     rnd.seed(seed);
-    Agent::setParameters(MM,mm,ll);
+    Agent::setParameters(MM,mm,WW);
     vector<Agent> agents;
     agents.resize(N);
     for(int j=0;j<IT;j++)
