@@ -35,8 +35,8 @@ public:
     static int m;
     static int l;
     void generateMatrix();
-
     Agent();
+
     ~Agent();
     bool speak(Agent& a, std::default_random_engine rnd);
     bool listen(int meaning, char* s, std::default_random_engine rnd);
@@ -62,7 +62,6 @@ public:
         }
         return;
     }
-
     static void removeFromDictionary(std::string word)
     {
         if(word=="")
@@ -82,6 +81,13 @@ public:
                 }
             }
         }
+        return;
+    }
+
+    static void setParameters(int MM,int mm, int ll)
+    {
+        M=MM;m=mm;l=ll;
+        dictionary.resize(0);
         return;
     }
 };

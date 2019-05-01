@@ -31,9 +31,9 @@ std::string to_string(char* c)
 
 
 std::vector<Word> Agent::dictionary;
-int Agent::M=50;
-int Agent::m=60;
-int Agent::l=2;
+int Agent::M;
+int Agent::m;
+int Agent::l;
 int Agent::unders=0;
 
 Agent::Agent()
@@ -93,7 +93,7 @@ void Agent::makeUpWord(char* word, std::default_random_engine rnd)
 void Agent::updateMemory(int meaning, char* word)
 {
     removeFromDictionary(to_string(this->memory[meaning][this->memoryIndex[meaning]]));
-    strncpy(this->memory[meaning][this->memoryIndex[meaning]],word, l);
+    strncpy(this->memory[meaning][this->memoryIndex[meaning]],word, l+1);
     addToDictionary(to_string(word));
     this->memoryIndex[meaning]=(this->memoryIndex[meaning]+1)%m;
     if(this->memoryCount[meaning]<m)
