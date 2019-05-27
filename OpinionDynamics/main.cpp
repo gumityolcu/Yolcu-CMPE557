@@ -56,8 +56,10 @@ int main()
     // Uniform random initialisation
     Init_Unif_Rnd(grid);
     int count=0;
-    int iterations[]={0,10,30,50,150,500,800,1500,7500,15000,20000,40000};
+    //int iterations[]={0,10,30,50,150,500,800,1500,7500,15000,20000,40000};
     bool in=true;
+    int iteration=0;
+    int lastcount=1;
     while(in)
     {
         interactions = 0;
@@ -69,35 +71,29 @@ int main()
             //cout<<"x = "<<x<<"  y = "<<y<<endl;
             interact(grid, x, y);
         }
-        if(z<12)
-        {
-            if(count==iterations[z])
-            {
-                filename="./"+to_string(count)+".jpg";
-                writeFile(filename, grid);
-                z++;
-            }
-        }
         count++;
         cout << count << endl;
         if(count==40001)
         {
             in=false;
         }
+        if(count==iteration+lastcount)
+        {
+            showGrid(grid, "n");
+            lastcount=count;
+            c = waitKey(0);
+        }
         //writeFile("./a.jpg",grid);
         //in=false;
-    }
-    showGrid(grid, "n");
-    c = waitKey(0);
-    /*if(c == 32)
-    {
+        if(c == 122)
+        {
             iteration = 1;
         }
         else if(c == 113)
         {
             in=false;
         }
-        else if(c==122)
+        else if(c==120)
         {
             iteration = 300;
         }
@@ -109,7 +105,8 @@ int main()
         {
             iteration=20000;
         }
-    }*/
+    }
+
     cout<<count*N*N<<endl;
 
     return 0;
