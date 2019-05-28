@@ -30,6 +30,8 @@ int runSimulationUntilEmergence(int N, int MM, int mm, int WW, int MAX_IT);
 vector<int> runSimulationTimeLapse(int N, int MM, int mm, int WW, int IT);
 int main()
 {
+
+    //Run simulation by varying m and generate MATLAB code for plotting average results
     string matlabM="M=[1:"+to_string(SKIP)+":"+to_string(RANGE)+"];";
     string matlabFit="Fit=[";
     string matlabDict="Dict=[";
@@ -101,7 +103,10 @@ int main()
     cout<<matlab;
 
 
-    /*string matlabM="M=[1:"+to_string(SKIP)+":"+to_string(RANGE)+"];";
+    /*
+    //Run simulation until emergence of vocabulary for different m
+     //Generate Matlab code for plotting average results
+    string matlabM="M=[1:"+to_string(SKIP)+":"+to_string(RANGE)+"];";
     string matlabN="N=[";
 
 
@@ -130,21 +135,10 @@ int main()
     cout<<matlab;*/
 
 
-    /*for(int i=0;i<15;i++)
-    {
-        double iterations=0;
-        for(int j=0;j<AVERAGE_IT;j++) {
-            int ret;
-            ret = runSimulationUntilEmergence(10, 10, 30, 150,500);
-            cout<<ret<<"   ";
-            iterations += ret;
-        }
-        iterations/=AVERAGE_IT;
-        cout<<iterations<<endl;
-    }*/
 
-
-    /*string matlabN="N=[";
+    /*
+    //Run simulation once and generate Matlab code for plotting time evolution of the number of words used by the population
+    string matlabN="N=[";
     vector<int> ret;
     ret = runSimulationTimeLapse(20, 20, 8,INT_MAX,4000);
     for(int j=0;j<ret.size();j++)
