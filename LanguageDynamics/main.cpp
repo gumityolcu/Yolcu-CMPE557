@@ -289,7 +289,7 @@ vector<int> runSimulationTimeLapse(int N, int MM, int mm, int WW, int IT)
     {
         mod=true;
     }
-    Agent::setParameters(MM,mm,WW,mod);
+    Agent::setParameters(MM,mm,WW);
     vector<Agent> agents;
     agents.resize(N);
     for(int j=0;j<IT;j++)
@@ -357,26 +357,5 @@ int runSimulationUntilEmergence(int N, int MM, int mm, int WW, int MAX_IT)
         IT=-1;
     }
     return IT;
-
-}
-
-double calculatePopulationDistinctiveness(vector<Agent>& agents, int N)
-{
-    double ret=0;
-    for(int i=0;i<N;i++)
-    {
-        ret=ret+agents[i].calculateDistinctiveness();
-    }
-    return ret/N;
-
-}
-double calculatePopulationConsistency(vector<Agent>& agents, int N)
-{
-    double ret=0;
-    for(int i=0;i<N;i++)
-    {
-        ret=ret+agents[i].calculateConsistency();
-    }
-    return ret/N;
 
 }

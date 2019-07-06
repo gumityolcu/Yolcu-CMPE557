@@ -9,9 +9,6 @@ std::vector<Word> Agent::dictionary;
 int Agent::M;
 int Agent::m;
 unsigned int Agent::W;
-bool Agent::Model=false;
-int Agent::unders=0;
-int Agent::deleted=0;
 
 Agent::Agent()
 {
@@ -23,12 +20,12 @@ Agent::Agent()
         this->memory[i]=new unsigned int[m];
         for(int j=0;j<m;j++)
         {
+            // 0 stands for "No word present". Thus 0 is not a word or symbol
             this->memory[i][j]=0;
         }
         this->memoryIndex[i]=0;
         this->memoryCount[i]=0;
     }
-    this->dictionary.resize(0);
 }
 
 Agent::~Agent()
@@ -44,16 +41,21 @@ Agent::~Agent()
 
 void Agent::makeUpWord(unsigned int* word, std::default_random_engine rnd)
 {
-    std::uniform_int_distribution<int> unif(1,Agent::W);
+    // 0 is not a word
+    std::uniform_int_distribution<unsigned int> unif(1,Agent::W);
+    // ???
     *(word)=unif(rnd);
     return;
 }
+
 void Agent::updateMemory(int meaning, unsigned int word)
 {
+    // Remove the overwritten word, notice that if there is no word to be overwritten (i.e. argument to removeFromDictionary is 0) nothing is done
     removeFromDictionary(this->memory[meaning][this->memoryIndex[meaning]]);
     this->memory[meaning][this->memoryIndex[meaning]]=word;
     addToDictionary(word);
     this->memoryIndex[meaning]=(this->memoryIndex[meaning]+1)%m;
+
     if(this->memoryCount[meaning]<m)
     {
         this->memoryCount[meaning]++;
@@ -61,95 +63,35 @@ void Agent::updateMemory(int meaning, unsigned int word)
     return;
 }
 
-void Agent::deleteFromMemory(int meaning, unsigned int word)
-{
-    int delIndex=this->memoryIndex[meaning];
-    int readIndex=this->memoryIndex[meaning];
-    int wrIndex=0;
-    int* newMemory=new int[m];
-    bool found=false;
-    while(!found)
-    {
-        if(this->memory[meaning][delIndex]==word)
-        {
-            found=true;
-            this->memory[meaning][delIndex]=0;
-            removeFromDictionary(word);
-            this->memoryCount[meaning]--;
-        }
-        else
-        {
-            delIndex=(delIndex+1)%m;
-        }
-    }
-    //Rearrange memory
-    for(int i=0;i<m;i++)
-    {
-        newMemory[i]=0;
-    }
-    if(this->memory[meaning][readIndex]!=0)
-    {
-        newMemory[wrIndex]=this->memory[meaning][readIndex];
-        wrIndex++;
-    }
-    readIndex=(readIndex+1)%m;
-    while(readIndex!=this->memoryIndex[meaning])
-    {
-        if(this->memory[meaning][readIndex]!=0)
-        {
-            newMemory[wrIndex]=this->memory[meaning][readIndex];
-            wrIndex++;
-        }
-        readIndex=(readIndex+1)%m;
-    }
-    int finalIndex=-1;
-    for(int i=0;i<m;i++)
-    {
-        this->memory[meaning][i]=newMemory[i];
-        if(newMemory[i]==0)
-        {
-            if(finalIndex==-1)
-            {
-                finalIndex=i;
-            }
-        }
-    }
-    this->memoryIndex[meaning]=finalIndex;
-    return;
-}
-
 bool Agent::speak(Agent& a, std::default_random_engine& rnd)
 {
     std::uniform_int_distribution<int> unifM(0,M-1);
+    // Select a random meaning
     int meaning=unifM(rnd);
-    //meaning = 3;
-    //std::cout<<" meaning: "<<meaning;
     unsigned int s;
+
+    // If there is no word in memory for the meaning
     if(this->memoryCount[meaning]==0)
     {
+        // Choose a random word
         makeUpWord(&s,rnd);
+        // Add it to memory regardless of success
         updateMemory(meaning, s);
     }
     else
     {
+        // If at least one word is found
         std::uniform_int_distribution<int> unif(0,this->memoryCount[meaning]-1);
+        // Select a word at random
         int r=unif(rnd);
         s=this->memory[meaning][r];
     }
-    //std::cout<<" \""<<s<<"\" ";
+    // Learn if communication was successful
     bool ret=a.listen(meaning,s, rnd);
     if(ret)
     {
-        //std::cout<<"understood"<<std::endl;
+        // If successful, add the word to memory
         this->updateMemory(meaning,s);
-    }
-    else
-    {
-        //std::cout<<"understoodn't"<<std::endl;
-        if(Agent::Model)
-        {
-            this->deleteFromMemory(meaning,s);
-        }
     }
 
     return ret;
@@ -158,29 +100,35 @@ bool Agent::speak(Agent& a, std::default_random_engine& rnd)
 bool Agent::listen(int meaning, unsigned int s, std::default_random_engine rnd)
 {
     bool understood=false;
-    std::vector<int> prob;
-    prob.resize(0);
+    std::vector<int> list;
+    list.resize(0);
+    // For each meaning
     for(int i=0;i<M;i++)
     {
         for(int j=0;j<this->memoryCount[i];j++)
         {
+            // If the word is found in the memory for that meaning
             if(this->memory[i][j]==s)
             {
-                prob.push_back(i);
+                // Add it to the list
+                list.push_back(i);
             }
         }
     }
-    if(prob.size()>0)
+    if(list.size()>0)
     {
-        std::uniform_int_distribution<int> unif(0,prob.size()-1);
-        int r=unif(rnd);//randomise
-        if(prob[r]==meaning)
+        std::uniform_int_distribution<int> unif(0,list.size()-1);
+        // Select random meaning from list
+        int r=unif(rnd);
+        // If selected meaning is the same as the intended meaning, it is a success
+        if(list[r]==meaning)
         {
             understood=true;
-            unders++;
         }
     }
+    // Update memory
     this->updateMemory(meaning,s);
+    // Return success information
     return understood;
 }
 
@@ -206,62 +154,6 @@ void Agent::generateMatrix()
     }
     this->matrixReady=true;
     return;
-}
-
-double Agent::calculateDistinctiveness()
-{
-    if(!this->matrixReady)
-    {
-        return 0;
-    }
-    int count=0;
-    Eigen::MatrixXd mat=normaliseByRow(this->A.transpose());
-    double cumulP=0;
-    for(int c=0;c<mat.rows();c++)
-    {
-        double maxP=0;
-        for(int r=0;r<mat.cols();r++)
-        {
-            if(mat(c,r)>maxP)
-            {
-                maxP=mat(c,r);
-            }
-        }
-        if(maxP>0)
-        {
-            count++;
-            cumulP=cumulP+maxP;
-        }
-    }
-    return cumulP/count;
-}
-
-double Agent::calculateConsistency()
-{
-    if(!this->matrixReady)
-    {
-        return 0;
-    }
-    int count=0;
-    Eigen::MatrixXd mat=normaliseByRow(this->A);
-    double cumulP=0;
-    for(int r=0;r<mat.rows();r++)
-    {
-        double maxP=0;
-        for(int c=0;c<mat.cols();c++)
-        {
-            if(mat(r,c)>maxP)
-            {
-                maxP=mat(r,c);
-            }
-        }
-        if(maxP>0)
-        {
-            count++;
-            cumulP=cumulP+maxP;
-        }
-    }
-    return cumulP/count;
 }
 
 Eigen::MatrixXd normaliseByRow(Eigen::MatrixXi mat)
