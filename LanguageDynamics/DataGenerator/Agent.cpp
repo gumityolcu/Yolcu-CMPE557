@@ -39,7 +39,7 @@ Agent::~Agent()
     delete this->memory;
 }
 
-void Agent::makeUpWord(unsigned int* word, std::default_random_engine rnd)
+void Agent::makeUpWord(unsigned int* word, std::default_random_engine& rnd)
 {
     // 0 is not a word
     std::uniform_int_distribution<unsigned int> unif(1,Agent::W);
@@ -97,7 +97,7 @@ bool Agent::speak(Agent& a, std::default_random_engine& rnd)
     return ret;
 }
 
-bool Agent::listen(int meaning, unsigned int s, std::default_random_engine rnd)
+bool Agent::listen(int meaning, unsigned int s, std::default_random_engine& rnd)
 {
     bool understood=false;
     std::vector<int> list;

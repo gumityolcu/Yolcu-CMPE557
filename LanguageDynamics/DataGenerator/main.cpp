@@ -1,18 +1,21 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <random>
+#include <time.h>
 #include "Agent.h"
 
 using namespace std;
 using namespace Eigen;
 
-void runSimulationForIterations(int id, int N, int MM, int mm, int WW, int IT);
+void runSimulationForIterations(int machineID, int replicationID, int N, int MM, int mm, int WW, int IT, default_random_engine& rnd);
 
 int main(int argc, char** argv)
 {
     string args="";
-    if(argc != 7)
+    if(argc != 8)
     {
-        cout<<"Run the program as :"<<"LanguageDynamics <id> <N> <M> <W> <m> <IT>"<<endl;
+        cout<<"Run the program as :"<<"DataGenerator <id> <# of replications> <N> <M> <W> <m> <IT>"<<endl;
         return 1;
     }
     for(int i=1;i<argc;i++)
@@ -22,25 +25,28 @@ int main(int argc, char** argv)
     }
     istringstream str;
     str.str(args);
-    int id,N,M,W,m,IT;
-
-    // Parse arguments
-    str>>id>>N>>M>>W>>m>>IT;
-
-    // Start simulation
-    runSimulationForIterations(id,N,M,W,m,IT);
-    return 0;
-}
-
-void runSimulationForIterations(int id, int N, int MM, int WW, int mm, int IT)
-{
-    ofstream file;
-    string fname;
-    uniform_int_distribution<int> unif(0,N-1);
+    int id,numOfReplications,N,M,W,m,IT;
     default_random_engine rnd;
     srand(time(NULL));
     int seed=rand();
     rnd.seed(seed);
+
+    // Parse arguments
+    str>>id>>numOfReplications>>N>>M>>W>>m>>IT;
+
+    // Start simulation
+    for(int i=0;i<numOfReplications;i++)
+    {
+        runSimulationForIterations(id,i,N,M,W,m,IT,rnd);
+    }
+    return 0;
+}
+
+void runSimulationForIterations(int machineID, int replicationID, int N, int MM, int WW, int mm, int IT, default_random_engine& rnd)
+{
+    ofstream file;
+    string fname;
+    uniform_int_distribution<int> unif(0,N-1);
 
     Agent::setParameters(MM,mm,WW);
     vector<Agent> agents;
@@ -48,7 +54,7 @@ void runSimulationForIterations(int id, int N, int MM, int WW, int mm, int IT)
     agents.resize(N);
     dictSize.resize(0);
 
-    fname="id="+to_string(id)+"|N="+to_string(N)+"|M="+to_string(MM)+"|m="+to_string(mm)+"|W="+to_string(WW)+"|IT="+to_string(IT);
+    fname="MID="+to_string(machineID)+"|RID="+to_string(replicationID)+"|NNN="+to_string(N)+"|MMM="+to_string(MM)+"|WWW="+to_string(WW)+"|mmm="+to_string(mm)+"|ITE="+to_string(IT);
 
     for(int j=0;j<IT;j++)
     {
@@ -64,7 +70,7 @@ void runSimulationForIterations(int id, int N, int MM, int WW, int mm, int IT)
             // Speak
             agents[i].speak(agents[k],rnd);
         }
-        cout<<"% "<<(int)((double)j/IT*100)<<endl;
+        //cout<<"% "<<(int)((double)j/IT*100)<<endl;
         dictSize.push_back(Agent::dictionary.size());
     }
 
@@ -75,7 +81,7 @@ void runSimulationForIterations(int id, int N, int MM, int WW, int mm, int IT)
         return;
     }
     file<<"Parameters"<<endl;
-    file<<id<<"\t"<<N<<"\t"<<MM<<"\t"<<mm<<"\t"<<WW<<"\t"<<IT<<endl<<endl;
+    file<<N<<"\t"<<MM<<"\t"<<mm<<"\t"<<WW<<"\t"<<IT<<endl<<endl;
     file<<"Dictionary size"<<endl;
     for(int i=0;i<IT;i++)
     {

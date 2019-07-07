@@ -7,8 +7,6 @@
 
 #include <Eigen/Dense>
 #include <vector>
-#include <random>
-#include <time.h>
 
 /*
  * Structure Word is used for keeping track of the words used by the population during the simulation
@@ -50,9 +48,9 @@ public:
     // Speak with another agent
     bool speak(Agent& a, std::default_random_engine& rnd);
     // Listen another agent. Notice that we don't need to know anything about the speaker agent, we return the success value, true of false
-    bool listen(int meaning, unsigned int s, std::default_random_engine rnd);
+    bool listen(int meaning, unsigned int s, std::default_random_engine& rnd);
     void updateMemory(int meaning, unsigned int word);
-    void makeUpWord(unsigned int* word, std::default_random_engine rnd);
+    void makeUpWord(unsigned int* word, std::default_random_engine& rnd);
 
     static void addToDictionary(unsigned int word)
     {
