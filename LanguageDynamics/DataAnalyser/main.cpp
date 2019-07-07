@@ -9,18 +9,35 @@ using namespace std;
 
 typedef struct SimRes{
     double populationFitness=0;
+
+    struct SimRes operator+(const struct SimRes b)
+    {
+        struct SimRes ret;
+        ret.populationFitness=this->populationFitness+b.populationFitness;
+        return ret;
+    }
+
+    struct SimRes operator/(int b)
+    {
+        struct SimRes ret;
+        ret.populationFitness=this->populationFitness/b;
+        return ret;
+    }
+
 }SimulationResults;
 
 typedef struct _Agent{
     Eigen::MatrixXi A;
     Eigen::MatrixXd P; // M x W
     Eigen::MatrixXd Q; // W x M
+
+
 }Agent;
 
 Eigen::MatrixXd normaliseByRow(Eigen::MatrixXi mat);
 
 SimulationResults mode0(string fname);
-SimulationResults mode1(int MID, int RID, int N, int M, int W, int m, int IT);
+SimulationResults mode1(int MID, int numOfReplications, int N, int M, int W, int m, int IT);
 double calculatePopulationFitness(vector<Agent>& population);
 double calculateFitnessBetweenAgents(Agent& a1, Agent& a2);
 
@@ -67,6 +84,8 @@ int main(int argc, char** argv) {
         case 2:
             break;
     }
+
+    cout<<res.populationFitness;
     return 0;
 }
 
@@ -129,14 +148,20 @@ SimulationResults mode0(string fname)
     // WE READ THE DATA, CAN START CALCULATING
     ret.populationFitness=calculatePopulationFitness(agents);
 
-    cout<<ret.populationFitness;
     return ret;
 }
 
-SimulationResults mode1(int MID, int RID, int N, int M, int W, int m, int IT)
+SimulationResults mode1(int MID, int numOfReplications, int N, int M, int W, int m, int IT)
 {
     SimulationResults ret;
-
+    string filename;
+    for(int i=0;i<numOfReplications;i++)
+    {
+        filename="MID="+to_string(MID)+"|RID="+to_string(i)+"|N="+to_string(N)+"|M="+to_string(M)+"|W="+to_string(W)+"|m="+to_string(m)+"|IT="+to_string(IT);
+        ret=ret+mode0(filename);
+    }
+    ret=ret/numOfReplications;
+    return ret;
 
 }
 
