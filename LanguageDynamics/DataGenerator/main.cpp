@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <random>
 #include <time.h>
 #include "Agent.h"
 
@@ -54,7 +53,7 @@ void runSimulationForIterations(int machineID, int replicationID, int N, int MM,
     agents.resize(N);
     dictSize.resize(0);
 
-    fname="MID="+to_string(machineID)+"|RID="+to_string(replicationID)+"|NNN="+to_string(N)+"|MMM="+to_string(MM)+"|WWW="+to_string(WW)+"|mmm="+to_string(mm)+"|ITE="+to_string(IT);
+    fname="MID="+to_string(machineID)+"|RID="+to_string(replicationID)+"|N="+to_string(N)+"|M="+to_string(MM)+"|W="+to_string(WW)+"|m="+to_string(mm)+"|IT="+to_string(IT);
 
     for(int j=0;j<IT;j++)
     {
@@ -81,18 +80,19 @@ void runSimulationForIterations(int machineID, int replicationID, int N, int MM,
         return;
     }
     file<<"Parameters"<<endl;
-    file<<N<<"\t"<<MM<<"\t"<<mm<<"\t"<<WW<<"\t"<<IT<<endl<<endl;
+    file<<N<<"\t"<<MM<<"\t"<<WW<<"\t"<<mm<<"\t"<<IT<<endl;
     file<<"Dictionary size"<<endl;
-    for(int i=0;i<IT;i++)
+    for(int i=0;i<IT-1;i++)
     {
         file<<dictSize[i]<<"\t";
     }
-    file<<endl<<endl;
+    file<<dictSize[dictSize.size()-1];
+    file<<endl;
     for(int ag=0;ag<agents.size();ag++)
     {
         file<<"Agent "<<ag<<endl;
         agents[ag].generateMatrix();
-        file<<agents[ag].A<<endl<<endl;
+        file<<agents[ag].A<<endl;
     }
     file.close();
     return;

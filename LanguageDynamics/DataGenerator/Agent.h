@@ -7,6 +7,7 @@
 
 #include <Eigen/Dense>
 #include <vector>
+#include <random>
 
 /*
  * Structure Word is used for keeping track of the words used by the population during the simulation
