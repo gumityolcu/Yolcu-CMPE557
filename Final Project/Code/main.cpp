@@ -1,9 +1,10 @@
 #include <iostream>
+#include <utility>
 #include "Agent.h"
 
-#define AVERAGE_IT 10
-#define SKIP 1
-#define RANGE 60
+#define AVERAGE_IT 30
+#define SKIP 2
+#define RANGE 30
 #define SUCCESS 0.95
 #define MODEL 0
 using namespace std;
@@ -25,11 +26,21 @@ double calculateFitnessBetweenAgents(Agent& a1, Agent& a2);
 double calculatePopulationFitness(vector<Agent>& population, int N);
 double calculatePopulationDistinctiveness(vector<Agent>& agents, int N);
 double calculatePopulationConsistency(vector<Agent>& agents, int N);
-SimulationResults runSimulationForIterations(int NN, int MM, int mm, int WW, int IT);
+SimulationResults runSimulationForIterations(int NN, int MM, int mm, int WW, int IT, vector<pair<int,int>>& combinations);
 int runSimulationUntilEmergence(int N, int MM, int mm, int WW, int MAX_IT);
 vector<int> runSimulationTimeLapse(int N, int MM, int mm, int WW, int IT);
 int main()
 {
+
+    vector<pair<int,int>> combinations;
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 10; j++) {
+            if (i != j) {
+                //Generate combinations of agents
+                combinations.emplace_back(std::pair<int, int>(i, j));
+            }
+        }
+    }
 
     //Run simulation by varying m and generate MATLAB code for plotting average results
     string matlabM="M=[1:"+to_string(SKIP)+":"+to_string(RANGE)+"];";
@@ -45,7 +56,7 @@ int main()
         SimulationResults r,avg;
         for(int j=0;j<AVERAGE_IT;j++)
         {
-            r=runSimulationForIterations(20,20,i,INT_MAX,1000);
+            r=runSimulationForIterations(10,10,i,10,1000, combinations);
             avg.MinimumUtilisation+=r.MinimumUtilisation;
             avg.MaximumUtilisation+=r.MaximumUtilisation;
             avg.AverageUtilisation+=r.AverageUtilisation;
@@ -202,7 +213,7 @@ double calculatePopulationFitness(vector<Agent>& population, int N)
 }
 
 
-SimulationResults runSimulationForIterations(int N, int MM, int mm, int WW, int IT)
+SimulationResults runSimulationForIterations(int N, int MM, int mm, int WW, int IT, vector<pair<int,int>>& combinations)
 {
     SimulationResults ret;
     uniform_int_distribution<int> unif(0,N-1);
@@ -218,21 +229,18 @@ SimulationResults runSimulationForIterations(int N, int MM, int mm, int WW, int 
     Agent::setParameters(MM,mm,WW,mod);
     vector<Agent> agents;
     agents.resize(N);
-    for(int j=0;j<IT;j++)
+    for(int ke=0;ke<IT;ke++)
     {
-        for(int i=0;i<N;i++)
-        {
-            int k=i;
-            while(k==i)
-            {
-                k=unif(rnd);
-            }
-            //i=0;k=1;
-            //cout<<i<<" speaking to "<<k;
-            agents[i].speak(agents[k],rnd);
+        for (int boundary = combinations.size(); boundary > 0; boundary--) {
+            std::uniform_int_distribution<int> unif(0, boundary - 1);
+            int r = unif(rnd);
+            std::pair<int, int> sel = combinations[r];
+            combinations[r] = combinations[boundary - 1];
+            combinations[boundary - 1] = sel;
+            agents[sel.first].speak(agents[sel.second],rnd);
+
         }
     }
-
     for(int ag=0;ag<agents.size();ag++)
     {
         agents[ag].generateMatrix();
@@ -281,9 +289,8 @@ vector<int> runSimulationTimeLapse(int N, int MM, int mm, int WW, int IT)
     vector<int> ret;
     uniform_int_distribution<int> unif(0,N-1);
     default_random_engine rnd;
-    srand(time(NULL));
-    int seed=rand();
-    rnd.seed(seed);
+    random_device r;
+    rnd.seed(r());
     bool mod=false;
     if(MODEL)
     {

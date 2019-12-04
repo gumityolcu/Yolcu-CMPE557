@@ -39,7 +39,7 @@ public:
     Agent();
     ~Agent();
     bool speak(Agent& a, std::default_random_engine& rnd);
-    bool listen(int meaning, unsigned int s, std::default_random_engine rnd);
+    int listen(int meaning, unsigned int s, std::default_random_engine rnd);
     void updateMemory(int meaning, unsigned int word);
     void deleteFromMemory(int meaning, unsigned int word);
     void makeUpWord(unsigned int* word, std::default_random_engine rnd);

@@ -15,6 +15,10 @@ int Agent::deleted=0;
 
 Agent::Agent()
 {
+    std::default_random_engine rnd;
+    std::random_device r;
+    rnd.seed(r());
+    std::uniform_int_distribution<unsigned int> unif(0,W-1);
     this->memoryCount=new int[M];
     this->memoryIndex=new int[M];
     this->memory=new unsigned int*[M];
@@ -23,12 +27,11 @@ Agent::Agent()
         this->memory[i]=new unsigned int[m];
         for(int j=0;j<m;j++)
         {
-            this->memory[i][j]=0;
+            this->memory[i][j]=unif(rnd);
         }
         this->memoryIndex[i]=0;
-        this->memoryCount[i]=0;
+        this->memoryCount[i]=m;
     }
-    this->dictionary.resize(0);
 }
 
 Agent::~Agent()
@@ -137,8 +140,8 @@ bool Agent::speak(Agent& a, std::default_random_engine& rnd)
         s=this->memory[meaning][r];
     }
     //std::cout<<" \""<<s<<"\" ";
-    bool ret=a.listen(meaning,s, rnd);
-    if(ret)
+    int m_l=a.listen(meaning,s, rnd);
+    if(m_l==meaning)
     {
         //std::cout<<"understood"<<std::endl;
         this->updateMemory(meaning,s);
@@ -146,16 +149,20 @@ bool Agent::speak(Agent& a, std::default_random_engine& rnd)
     else
     {
         //std::cout<<"understoodn't"<<std::endl;
+        if(m_l!=-1)
+        {
+            //this->updateMemory(m_l,s);
+        }
         if(Agent::Model)
         {
             this->deleteFromMemory(meaning,s);
         }
     }
 
-    return ret;
+    return (m_l==meaning);
 }
 
-bool Agent::listen(int meaning, unsigned int s, std::default_random_engine rnd)
+int Agent::listen(int meaning, unsigned int s, std::default_random_engine rnd)
 {
     bool understood=false;
     std::vector<int> prob;
@@ -170,18 +177,33 @@ bool Agent::listen(int meaning, unsigned int s, std::default_random_engine rnd)
             }
         }
     }
+    int ret=-1;
     if(prob.size()>0)
     {
         std::uniform_int_distribution<int> unif(0,prob.size()-1);
         int r=unif(rnd);//randomise
-        if(prob[r]==meaning)
+        ret=prob[r];
+        if(ret==meaning)
         {
             understood=true;
             unders++;
         }
     }
-    this->updateMemory(meaning,s);
-    return understood;
+    else
+    {
+        std::uniform_int_distribution<int> unifM(0,M-1);
+        ret=unifM(rnd);
+        this->updateMemory(ret,s);
+    }
+    if(ret==meaning)
+    {
+        //this->updateMemory(meaning,s);
+    }
+    else
+    {
+        //this->updateMemory(meaning,s);
+    }
+    return ret;
 }
 
 void Agent::generateMatrix()
